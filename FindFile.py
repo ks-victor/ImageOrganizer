@@ -15,15 +15,16 @@ file = ""
 dubs = 0
 total = 0
 workload = 0
+counter = 0
 
 print root_path
 
 for root, dirs, filenames in os.walk(root_path):
     for filename in filenames:
         if root == dubdir:
-            continue
+            break
         if filename[:1] == '.':
-            continue
+            break
         workload = workload + 1
         print "\rCalculating Workload:", workload,
 print ""
@@ -32,15 +33,16 @@ for root, dirs, filenames in os.walk(root_path):
     # folder level
     for filename in filenames:
         # file level
+        # below files not to check e.g. in dub dir and hidden
         if root == dubdir:
-            continue
+            break
         if filename[:1] == '.':
-            continue
+            break
         file = os.path.join(root, filename)
         hash = hashlib.md5(open(file, 'rb').read()).hexdigest()
-        #print "\r", file,
         for x in dict:
             if x == file:
+                # break if compared to self
                 break
             else:
                 if dict[x] == hash:
