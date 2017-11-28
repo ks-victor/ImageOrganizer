@@ -1,59 +1,51 @@
-import hashlib
+#!/usr/bin/python
+
 import os
-import shutil
-import sys
+import curses
+import hashlib
 
-#root_path = '/Volumes/Small/Audio/'
-root_path = '/Volumes/Small/Documents/'
-#root_path = '/Users/lallepot/Desktop/testing'
 
-dubdir = root_path+"/dub"
 
+parser = argparse.ArgumentParser(description="Find duplicate files and moves them other folder")
+parser.add_argument('root_path', type=str, action="store", help="Path to folder to scan")
+
+args = parser.parse_args()
+
+
+dubdir = args.root_path+"/dub"
+filelist = []
 dict = {}
-file = ""
 
-dubs = 0
-total = 0
-workload = 0
-counter = 0
 
-print root_path
+def filewalk(path):
+    count = 0
+    for root, dirs, filenames in os.walk(path):
+        for filename in filenames:
+            if root == dubdir:
+                continue
+            if filename[:1] == '.':
+                continue
+            file = os.path.join(root, filename)
+            filelist.append(file)
+            count = count + 1
+    return count;
 
-for root, dirs, filenames in os.walk(root_path):
-    for filename in filenames:
-        if root == dubdir:
-            break
-        if filename[:1] == '.':
-            break
-        workload = workload + 1
-        print "\rCalculating Workload:", workload,
-print ""
 
-for root, dirs, filenames in os.walk(root_path):
-    # folder level
-    for filename in filenames:
-        # file level
-        # below files not to check e.g. in dub dir and hidden
-        if root == dubdir:
-            break
-        if filename[:1] == '.':
-            break
-        file = os.path.join(root, filename)
-        hash = hashlib.md5(open(file, 'rb').read()).hexdigest()
-        for x in dict:
-            if x == file:
-                # break if compared to self
-                break
-            else:
-                if dict[x] == hash:
-                    if not os.path.isdir(dubdir):
-                        os.mkdir(dubdir)
-                    shutil.move(file, dubdir+'/'+filename)
-                    dubs = dubs + 1
-                    break
-        dict.update({file: hash})
-        total = total + 1
-        print "\rProgress:", total , "/", workload, "(Duplicates:", str(dubs)+")",
-print ""
+def getfile():
+    file = filelist.pop(0)
+    return file;
 
-print "Checked Files: ", total,"\n", "Number of Duplicates:", dubs
+
+def hashit():
+    file = getfile()
+    hash = hashlib.md5(open(file, 'rb').read()).hexdigest()
+    dict.update({file: hash})
+
+
+if __name__ == '__main__':
+    filewalk(args.root_path)
+    while len(filelist) is not 0:
+        for x in filelist:
+            hashit()
+    print 'dict size:', len(dict), 'filelist size:', len(filelist)
+
