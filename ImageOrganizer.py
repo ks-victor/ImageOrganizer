@@ -19,10 +19,6 @@ parser.add_argument('-t', '--test', dest='testing', action='store_true', help="T
 parser.add_argument('-vvv', action="store_const", dest="verbose", const='INFO')
 parser.set_defaults(testing=True)
 
-#parser.set_defaults(root_path="/Users/lallepot/Projects/ImageCleanUp/testing")
-#parser.set_defaults(root_path="/Users/lallepot/Desktop/Backup/")
-#parser.set_defaults(root_path="/Users/lallepot/Desktop/Pictures/")
-
 parser.set_defaults(verbose="")
 
 
